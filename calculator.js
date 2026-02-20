@@ -129,12 +129,6 @@
     if (!Number.isFinite(attackMultiplier)) {
       return { error: "攻撃倍率は数値で入力してください" };
     }
-    if (![1, 2, 3].includes(hitCount)) {
-      return { error: "攻撃ヒット数は1〜3回を選択してください" };
-    }
-    if (!Number.isInteger(criticalCount) || criticalCount < 0 || criticalCount > hitCount) {
-      return { error: "クリティカル発生回数は0回以上、攻撃ヒット数以下で選択してください" };
-    }
 
     const normalCount = hitCount - criticalCount;
     const a = applyStage(attackPower, attackStage);
@@ -208,14 +202,8 @@
     const hitCount = Number.parseInt(params.attributeHitCount ?? "1", 10);
     const autoGuardActive = shouldApplyAutoGuard(params.autoGuard, params.penetration);
 
-    if (!["50", "100"].includes(level)) {
-      return { error: "レベルは50か100を選択してください" };
-    }
     if (!Number.isFinite(skillMultiplier)) {
       return { error: "特技倍率+値は数値で入力してください" };
-    }
-    if (![1, 2, 3].includes(hitCount)) {
-      return { error: "属性特技ヒット数は1〜3回を選択してください" };
     }
 
     const rateMul = attributeRateMultiplier(rateStage);
@@ -265,3 +253,4 @@
 
   global.DamageCalculator = api;
 })(typeof window !== "undefined" ? window : globalThis);
+

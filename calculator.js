@@ -193,7 +193,8 @@
     }[stage];
   }
 
-  function attributeStatusMultiplier(stage) {
+  function attributeStatusMultiplier(stage, attributeType) {
+    if (attributeType === "光") return 1;
     if (stage === "none") return 1;
     return 1.5 + Number.parseInt(stage, 10) * 0.1;
   }
@@ -219,7 +220,7 @@
 
     const rateMul = attributeRateMultiplier(rateStage);
     const resistMul = attributeResistanceMultiplier(resistanceStage);
-    const statusMul = attributeStatusMultiplier(statusStage);
+    const statusMul = attributeStatusMultiplier(statusStage, params.attributeType);
     if (!Number.isFinite(rateMul) || !Number.isFinite(resistMul) || !Number.isFinite(statusMul)) {
       return { error: "属性関連の選択値が不正です" };
     }

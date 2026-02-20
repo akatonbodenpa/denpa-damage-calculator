@@ -15,9 +15,9 @@
         <h2>攻撃する側</h2>
 
         <div class="damage-type-group">
-          <span>計算するダメージ種類</span>
-          <label><input type="radio" name="damageType" id="damageTypePhysical" value="物理ダメージ" checked /> ・物理ダメージ</label>
-          <label><input type="radio" name="damageType" id="damageTypeAttribute" value="属性特技ダメージ" /> ・属性特技ダメージ</label>
+          <span>攻撃手段</span>
+          <label><input type="radio" name="damageType" id="damageTypePhysical" value="打撃" checked /> 打撃</label>
+          <label><input type="radio" name="damageType" id="damageTypeAttribute" value="特技(全体属性)" /> 特技(全体属性)</label>
         </div>
 
         <div class="physical-only">
@@ -46,12 +46,11 @@
         </div>
 
         <div class="attribute-only hidden">
-          <label>攻撃する側のレベル
-            <select id="attributeLevel">
-              <option value="50">50レベル</option>
-              <option value="100">100レベル</option>
-            </select>
-          </label>
+          <div class="level-radio-group">
+            <span>攻撃する側のレベル</span>
+            <label><input type="radio" name="attributeLevel" id="attributeLevel50" value="50" checked />50レベル</label>
+            <label><input type="radio" name="attributeLevel" id="attributeLevel100" value="100" />100レベル</label>
+          </div>
           <label>属性
             <select id="attributeType">
               <option>火</option><option>水</option><option>電気</option><option>土</option>
@@ -59,7 +58,7 @@
             </select>
           </label>
           <label>特技倍率+値（未入力なら等倍）
-            <input id="skillMultiplier" type="number" step="0.01" placeholder="例: 0.75 / 1.13" />
+            <input id="skillMultiplier" type="number" step="0.01" placeholder="親アヒルのみの例：0.5" />
           </label>
           <label id="attributeRateLabel">火属性倍率
             <select id="attributeRateStage"></select>

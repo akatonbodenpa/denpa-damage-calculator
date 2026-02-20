@@ -112,7 +112,7 @@ function renderAttackers() {
             <label><input type="radio" name="attributeLevel-${index}" value="50" data-index="${index}" data-field="attributeLevel"${attacker.attributeLevel === "50" ? " checked" : ""}/>50レベル</label>
             <label><input type="radio" name="attributeLevel-${index}" value="100" data-index="${index}" data-field="attributeLevel"${attacker.attributeLevel === "100" ? " checked" : ""}/>100レベル</label>
           </div>
-          <label>属性
+          <label>特技の属性
             <select data-index="${index}" data-field="attributeType">
               ${ATTRIBUTES.map((attr) => `<option${attr === attacker.attributeType ? " selected" : ""}>${attr}</option>`).join("")}
             </select>
@@ -170,7 +170,7 @@ function renderAttackers() {
               </label>
             </div>
           ` : `
-            <label>属性特技ヒット数
+            <label>特技ヒット数
               <select data-index="${index}" data-field="attributeHitCount">
                 <option value="1"${attacker.attributeHitCount === "1" ? " selected" : ""}>1回</option>
                 <option value="2"${attacker.attributeHitCount === "2" ? " selected" : ""}>2回</option>
@@ -327,7 +327,7 @@ function recalculate() {
       });
 
     if (result.error) {
-      renderResult({ error: `攻撃する側 ${i + 1}人目: ${result.error}` });
+      renderResult({ error: `打撃を選択している場合は${result.error}` });
       return;
     }
 
@@ -456,3 +456,4 @@ function main() {
 }
 
 document.addEventListener("DOMContentLoaded", main);
+

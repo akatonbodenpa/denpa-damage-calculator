@@ -51,6 +51,10 @@
     return uniformDistribution(a, floor(a * 1.1), true);
   }
 
+  function shouldApplyAutoGuard(autoGuard, penetration) {
+    return autoGuard === "有り" && penetration !== "有り";
+  }
+
   function applyPostModifiers(damage, attackMultiplier, jankenResult, autoGuardActive) {
     let d = floor(damage * (1 + attackMultiplier));
 
@@ -89,6 +93,24 @@
     return { avg, min, max };
   }
 
+  function attachRemainingHp(result, targetHpText) {
+    if (targetHpText === "") return result;
+
+    const hp = Number.parseInt(targetHpText, 10);
+    if (!Number.isInteger(hp) || hp <= 0) {
+      return { error: "HPは正の整数で入力してください" };
+    }
+
+    return {
+      ...result,
+      remainingHp: {
+        avg: Math.max(0, hp - result.total.avg),
+        max: Math.max(0, hp - result.total.min),
+        min: Math.max(0, hp - result.total.max),
+      },
+    };
+  }
+
   function calculatePhysical(params) {
     const attackPower = Number.parseInt(params.attackPower, 10);
     const defensePower = Number.parseInt(params.defensePower, 10);
@@ -117,7 +139,7 @@
     const normalCount = hitCount - criticalCount;
     const a = applyStage(attackPower, attackStage);
     const b = applyStage(defensePower, defenseStage);
-    const autoGuardActive = params.autoGuard === "発動する";
+    const autoGuardActive = shouldApplyAutoGuard(params.autoGuard, params.penetration);
 
     const normal = finalizeDistribution(
       normalDefaultDistribution(a, b),
@@ -136,13 +158,15 @@
     const normalSummary = summarizeDistribution(normal);
     const criticalSummary = summarizeDistribution(critical);
 
-    return {
+    const result = {
       total: {
         avg: normalSummary.avg * normalCount + criticalSummary.avg * criticalCount,
         min: normalSummary.min * normalCount + criticalSummary.min * criticalCount,
         max: normalSummary.max * normalCount + criticalSummary.max * criticalCount,
       },
     };
+
+    return attachRemainingHp(result, params.targetHp ?? "");
   }
 
   function attributeRateMultiplier(stage) {
@@ -180,56 +204,48 @@
     const rateStage = params.attributeRateStage;
     const resistanceStage = params.attributeResistanceStage;
     const statusStage = params.attributeStatusStage;
-    const jankenResult = params.jankenResult;
-    const autoGuardActive = params.autoGuard === "発動する";
     const hitCount = Number.parseInt(params.attributeHitCount ?? "1", 10);
+    const autoGuardActive = shouldApplyAutoGuard(params.autoGuard, params.penetration);
 
-    if (!["50", "100"].includes(level)) {
-      return { error: "レベルは50か100を選択してください" };
+    if (!['50', '100'].includes(level)) {
+      return { error: 'レベルは50か100を選択してください' };
     }
     if (!Number.isFinite(skillMultiplier)) {
-      return { error: "特技倍率+値は数値で入力してください" };
+      return { error: '特技倍率+値は数値で入力してください' };
     }
     if (![1, 2, 3].includes(hitCount)) {
-      return { error: "属性特技ヒット数は1〜3回を選択してください" };
+      return { error: '属性特技ヒット数は1〜3回を選択してください' };
     }
 
     const rateMul = attributeRateMultiplier(rateStage);
     const resistMul = attributeResistanceMultiplier(resistanceStage);
     const statusMul = attributeStatusMultiplier(statusStage);
-
     if (!Number.isFinite(rateMul) || !Number.isFinite(resistMul) || !Number.isFinite(statusMul)) {
-      return { error: "属性関連の選択値が不正です" };
+      return { error: '属性関連の選択値が不正です' };
     }
 
-    const baseLow = level === "50" ? 107 : 384;
-    const baseHigh = level === "50" ? 177 : 639;
+    const baseLow = level === '50' ? 107 : 384;
+    const baseHigh = level === '50' ? 177 : 639;
     const attrMul = rateMul * resistMul * statusMul;
-
-    const totalDist = [];
-    const count = baseHigh - baseLow + 1;
-    const p = 1 / count;
+    const dist = [];
+    const p = 1 / (baseHigh - baseLow + 1);
 
     for (let d = baseLow; d <= baseHigh; d += 1) {
       let x = floor(d * (1 + skillMultiplier));
       x = floor(x * attrMul);
-
-      if (jankenResult === "勝ち") {
+      if (params.jankenResult === '勝ち') {
         x = floor(x * 1.5);
-      } else if (jankenResult === "負け") {
+      } else if (params.jankenResult === '負け') {
         x = floor(x * 0.7);
       }
-
-      if (autoGuardActive && x !== 1) {
+      if (autoGuardActive) {
         x = floor(x / 2);
       }
-
-      totalDist.push({ damage: x * hitCount, p });
+      dist.push({ damage: x * hitCount, p });
     }
 
-    return {
-      total: summarizeDistribution(totalDist),
-    };
+    const result = { total: summarizeDistribution(dist) };
+    return attachRemainingHp(result, params.targetHp ?? '');
   }
 
   const api = {
@@ -242,9 +258,9 @@
     attributeResistanceMultiplier,
   };
 
-  if (typeof module !== "undefined" && module.exports) {
+  if (typeof module !== 'undefined' && module.exports) {
     module.exports = api;
   }
 
   global.DamageCalculator = api;
-})(typeof window !== "undefined" ? window : globalThis);
+})(typeof window !== 'undefined' ? window : globalThis);

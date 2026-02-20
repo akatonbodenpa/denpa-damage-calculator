@@ -33,7 +33,6 @@ section {
   color: #111;
 }
 
-
 .side-columns,
 .result-columns {
   display: grid;
@@ -42,7 +41,7 @@ section {
 }
 
 .side-panel {
-  margin: 0;
+  margin: 0 0 16px;
   padding: 12px;
   border: 4px solid;
   border-radius: 10px;
@@ -84,13 +83,35 @@ button {
   cursor: pointer;
 }
 
-.details-toggle {
+.details-toggle,
+.add-attacker {
   width: 100%;
   margin: 12px 0 8px;
   border: 1px solid #adb5bd;
   border-radius: 8px;
   background: #f1f3f5;
   font-weight: 600;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.panel-head h2 {
+  margin: 0;
+}
+
+.mini-delete {
+  margin: 0;
+  padding: 6px 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  background: #fff5f5;
+  color: #c92a2a;
+  font-weight: 700;
 }
 
 .error {

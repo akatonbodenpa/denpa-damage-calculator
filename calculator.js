@@ -238,7 +238,7 @@
       } else if (params.jankenResult === '負け') {
         x = floor(x * 0.7);
       }
-      if (autoGuardActive) {
+      if (autoGuardActive && x !== 1) {
         x = floor(x / 2);
       }
       dist.push({ damage: x * hitCount, p });

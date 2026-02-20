@@ -87,7 +87,6 @@ function updateModeVisibility() {
 
 function toggleDetails(panelKey, forceExpanded) {
   const mode = getDamageType();
-  const isAttacker = panelKey === "attacker";
   const physicalDetails = byId(`${panelKey}PhysicalDetails`);
   const attributeDetails = byId(`${panelKey}AttributeDetails`);
   const toggleId = `${panelKey}DetailsToggle`;
@@ -108,14 +107,11 @@ function toggleDetails(panelKey, forceExpanded) {
   if (mode === "打撃") {
     physicalDetails.classList.remove("hidden");
     attributeDetails.classList.add("hidden");
-  } else {
-    physicalDetails.classList.add("hidden");
-    attributeDetails.classList.remove("hidden");
+    return;
   }
 
-  if (!isAttacker && mode === "特技(全体属性)") {
-    physicalDetails.classList.remove("hidden");
-  }
+  attributeDetails.classList.remove("hidden");
+  physicalDetails.classList.remove("hidden");
 }
 
 function renderResult(result) {

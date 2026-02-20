@@ -84,22 +84,27 @@ button {
 }
 
 
-.damage-type-group {
+.damage-type-group,
+.level-radio-group {
   margin: 8px 0 14px;
 }
 
-.damage-type-group > span {
+.damage-type-group > span,
+.level-radio-group > span {
   display: block;
   margin-bottom: 6px;
 }
 
-.damage-type-group label {
+.damage-type-group label,
+.level-radio-group label {
   display: inline-flex;
   align-items: center;
   margin-right: 14px;
+  white-space: nowrap;
 }
 
-.damage-type-group input[type="radio"] {
+.damage-type-group input[type="radio"],
+.level-radio-group input[type="radio"] {
   display: inline-block;
   margin: 0 4px 0 0;
   padding: 0;

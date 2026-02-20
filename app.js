@@ -59,8 +59,13 @@ function updateAttributeLabels() {
   byId("attributeStatusLabel").childNodes[0].textContent = `${attr}属性状態異常`;
 }
 
+function getDamageType() {
+  const checked = document.querySelector('input[name="damageType"]:checked');
+  return checked ? checked.value : "物理ダメージ";
+}
+
 function updateModeVisibility() {
-  const mode = byId("damageType").value;
+  const mode = getDamageType();
   document.querySelectorAll(".physical-only").forEach((el) => {
     el.classList.toggle("hidden", mode !== "物理ダメージ");
   });
@@ -90,7 +95,7 @@ function renderResult(result) {
 }
 
 function recalculate() {
-  const damageType = byId("damageType").value;
+  const damageType = getDamageType();
 
   const result = damageType === "物理ダメージ"
     ? DamageCalculator.calculatePhysical({
@@ -128,7 +133,6 @@ function main() {
   updateAttributeLabels();
 
   const watchIds = [
-    "damageType",
     "attackPower",
     "attackStage",
     "attackMultiplier",
@@ -158,9 +162,11 @@ function main() {
     recalculate();
   });
 
-  byId("damageType").addEventListener("change", () => {
-    updateModeVisibility();
-    recalculate();
+  document.querySelectorAll('input[name="damageType"]').forEach((el) => {
+    el.addEventListener("change", () => {
+      updateModeVisibility();
+      recalculate();
+    });
   });
 
   byId("attributeType").addEventListener("change", () => {

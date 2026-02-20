@@ -50,21 +50,21 @@
             <label>攻撃倍率+値（未入力なら等倍）
               <input id="attackMultiplier" type="number" step="0.01" placeholder="デカグロのみの例 : 0.7" />
             </label>
-
-            <div class="inline-two">
-              <label>攻撃ヒット数
-                <select id="hitCount">
-                  <option value="1" selected>1回</option>
-                  <option value="2">2回</option>
-                  <option value="3">3回</option>
-                </select>
-              </label>
-              <label>クリティカル発生回数
-                <select id="criticalCount"></select>
-              </label>
-            </div>
           </div>
+        </div>
 
+        <div id="attackerAttributeDetails" class="hidden">
+          <div class="attribute-only hidden">
+            <label>特技倍率+値（未入力なら等倍）
+              <input id="skillMultiplier" type="number" step="0.01" placeholder="親アヒルのみの例：0.5" />
+            </label>
+            <label id="attributeRateLabel">火属性倍率
+              <select id="attributeRateStage"></select>
+            </label>
+          </div>
+        </div>
+
+        <div id="attackerSharedDetails" class="hidden">
           <label>攻撃側のじゃんけん勝敗
             <select id="jankenResult">
               <option>無し、あいこ</option>
@@ -81,14 +81,8 @@
           </label>
         </div>
 
-        <div id="attackerAttributeDetails" class="hidden">
+        <div id="attackerAttributeHitDetails" class="hidden">
           <div class="attribute-only hidden">
-            <label>特技倍率+値（未入力なら等倍）
-              <input id="skillMultiplier" type="number" step="0.01" placeholder="親アヒルのみの例：0.5" />
-            </label>
-            <label id="attributeRateLabel">火属性倍率
-              <select id="attributeRateStage"></select>
-            </label>
             <label>属性特技ヒット数
               <select id="attributeHitCount">
                 <option value="1" selected>1回</option>
@@ -96,6 +90,23 @@
                 <option value="3">3回</option>
               </select>
             </label>
+          </div>
+        </div>
+
+        <div id="attackerPhysicalHitDetails" class="hidden">
+          <div class="physical-only">
+            <div class="inline-two">
+              <label>攻撃ヒット数
+                <select id="hitCount">
+                  <option value="1" selected>1回</option>
+                  <option value="2">2回</option>
+                  <option value="3">3回</option>
+                </select>
+              </label>
+              <label>クリティカル発生回数
+                <select id="criticalCount"></select>
+              </label>
+            </div>
           </div>
         </div>
       </section>
@@ -117,6 +128,14 @@
 
         <button type="button" id="defenderDetailsToggle" class="details-toggle">-----その他の詳細入力▼-----</button>
 
+        <div id="defenderAttributeDetails" class="hidden">
+          <div class="attribute-only hidden">
+            <label id="attributeStatusLabel">火属性状態異常
+              <select id="attributeStatusStage"></select>
+            </label>
+          </div>
+        </div>
+
         <div id="defenderPhysicalDetails" class="hidden">
           <div class="physical-only">
             <label>防御力のバフ、デバフ状態
@@ -134,14 +153,6 @@
           <label>HP
             <input id="targetHp" type="number" min="1" step="1" />
           </label>
-        </div>
-
-        <div id="defenderAttributeDetails" class="hidden">
-          <div class="attribute-only hidden">
-            <label id="attributeStatusLabel">火属性状態異常
-              <select id="attributeStatusStage"></select>
-            </label>
-          </div>
         </div>
       </section>
     </div>

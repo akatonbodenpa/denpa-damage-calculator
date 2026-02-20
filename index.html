@@ -10,16 +10,15 @@
   <main>
     <h1>ダメージ計算ツール</h1>
 
-    <label>計算するダメージ種類
-      <select id="damageType">
-        <option>物理ダメージ</option>
-        <option>属性特技ダメージ</option>
-      </select>
-    </label>
-
     <div class="side-columns">
       <section class="side-panel attacker-panel">
         <h2>攻撃する側</h2>
+
+        <div class="damage-type-group">
+          <span>計算するダメージ種類</span>
+          <label><input type="radio" name="damageType" id="damageTypePhysical" value="物理ダメージ" checked /> ・物理ダメージ</label>
+          <label><input type="radio" name="damageType" id="damageTypeAttribute" value="属性特技ダメージ" /> ・属性特技ダメージ</label>
+        </div>
 
         <div class="physical-only">
           <label>攻撃力
@@ -62,6 +61,9 @@
           <label>特技倍率+値（未入力なら等倍）
             <input id="skillMultiplier" type="number" step="0.01" placeholder="例: 0.75 / 1.13" />
           </label>
+          <label id="attributeRateLabel">火属性倍率
+            <select id="attributeRateStage"></select>
+          </label>
           <label>属性特技ヒット数
             <select id="attributeHitCount">
               <option value="1" selected>1回</option>
@@ -93,9 +95,6 @@
         </div>
 
         <div class="attribute-only hidden">
-          <label id="attributeRateLabel">火属性倍率
-            <select id="attributeRateStage"></select>
-          </label>
           <label id="attributeResistLabel">火属性耐性
             <select id="attributeResistanceStage"></select>
           </label>

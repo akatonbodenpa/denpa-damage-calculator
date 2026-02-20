@@ -11,7 +11,7 @@ main {
   padding: 24px;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 section {
@@ -55,7 +55,9 @@ label {
   margin: 8px 0;
 }
 
-input, select, button {
+input,
+select,
+button {
   display: block;
   margin-top: 4px;
   padding: 8px;
@@ -64,6 +66,15 @@ input, select, button {
 
 button {
   cursor: pointer;
+}
+
+.details-toggle {
+  width: 100%;
+  margin: 12px 0 8px;
+  border: 1px solid #adb5bd;
+  border-radius: 8px;
+  background: #f1f3f5;
+  font-weight: 600;
 }
 
 .error {
@@ -82,7 +93,6 @@ button {
 .hidden {
   display: none;
 }
-
 
 .damage-type-group,
 .level-radio-group {

@@ -5,6 +5,16 @@ function byId(id) {
 const ATTRIBUTES = ["火", "水", "電気", "土", "風", "氷", "闇", "光"];
 const MAX_ATTACKERS = 8;
 
+const STATUS_LABELS = {
+  火: "やけど",
+  水: "水浸し",
+  電気: "感電",
+  土: "泥だらけ",
+  風: "かぜっぴき",
+  氷: "しもやけ",
+  闇: "呪い",
+};
+
 function createDefaultAttacker() {
   return {
     damageType: "打撃",
@@ -201,6 +211,14 @@ function renderDefender() {
         </label>
       ` : ""}
 
+      ${hasAttribute ? usedAttributes.map((attr) => `
+        <label>${attr}属性耐性
+          <select data-defender-attr="${attr}" data-defender-kind="resistance">
+            ${stageOptions(-4, 9, d.attributes[attr].resistance)}
+          </select>
+        </label>
+      `).join("") : ""}
+
       <button type="button" class="details-toggle" data-action="toggle-defender-details">${detailsLabel(d.detailsExpanded)}</button>
 
       ${d.detailsExpanded ? `
@@ -210,13 +228,8 @@ function renderDefender() {
           </label>
         ` : ""}
 
-        ${hasAttribute ? usedAttributes.map((attr) => `
-          <label>${attr}属性耐性
-            <select data-defender-attr="${attr}" data-defender-kind="resistance">
-              ${stageOptions(-4, 9, d.attributes[attr].resistance)}
-            </select>
-          </label>
-          <label>${attr}属性状態異常
+        ${hasAttribute ? usedAttributes.filter((attr) => attr !== "光").map((attr) => `
+          <label>${STATUS_LABELS[attr] || `${attr}属性状態異常`}
             <select data-defender-attr="${attr}" data-defender-kind="status">
               <option value="none"${d.attributes[attr].status === "none" ? " selected" : ""}>無し</option>
               ${stageOptions(1, 9, d.attributes[attr].status)}

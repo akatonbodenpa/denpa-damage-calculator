@@ -82,3 +82,25 @@ button {
 .hidden {
   display: none;
 }
+
+
+.damage-type-group {
+  margin: 8px 0 14px;
+}
+
+.damage-type-group > span {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.damage-type-group label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 14px;
+}
+
+.damage-type-group input[type="radio"] {
+  display: inline-block;
+  margin: 0 4px 0 0;
+  padding: 0;
+}

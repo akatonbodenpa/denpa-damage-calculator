@@ -90,6 +90,9 @@ function toggleDetails(panelKey, forceExpanded) {
   const physicalDetails = byId(`${panelKey}PhysicalDetails`);
   const attributeDetails = byId(`${panelKey}AttributeDetails`);
   const toggleId = `${panelKey}DetailsToggle`;
+  const sharedDetails = panelKey === "attacker" ? byId("attackerSharedDetails") : null;
+  const physicalHitDetails = panelKey === "attacker" ? byId("attackerPhysicalHitDetails") : null;
+  const attributeHitDetails = panelKey === "attacker" ? byId("attackerAttributeHitDetails") : null;
 
   const expanded = typeof forceExpanded === "boolean"
     ? forceExpanded
@@ -101,16 +104,30 @@ function toggleDetails(panelKey, forceExpanded) {
   if (!expanded) {
     physicalDetails.classList.add("hidden");
     attributeDetails.classList.add("hidden");
+    if (sharedDetails) sharedDetails.classList.add("hidden");
+    if (physicalHitDetails) physicalHitDetails.classList.add("hidden");
+    if (attributeHitDetails) attributeHitDetails.classList.add("hidden");
     return;
   }
 
   if (mode === "打撃") {
     physicalDetails.classList.remove("hidden");
     attributeDetails.classList.add("hidden");
+    if (sharedDetails) sharedDetails.classList.remove("hidden");
+    if (physicalHitDetails) physicalHitDetails.classList.remove("hidden");
+    if (attributeHitDetails) attributeHitDetails.classList.add("hidden");
     return;
   }
 
   attributeDetails.classList.remove("hidden");
+  if (panelKey === "attacker") {
+    physicalDetails.classList.add("hidden");
+    sharedDetails.classList.remove("hidden");
+    physicalHitDetails.classList.add("hidden");
+    attributeHitDetails.classList.remove("hidden");
+    return;
+  }
+
   physicalDetails.classList.remove("hidden");
 }
 

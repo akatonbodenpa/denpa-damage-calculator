@@ -143,7 +143,7 @@ function renderResult(result) {
     ? `
       <h4>残りHP</h4>
       <ul>
-        <li>平均残りHP: ${result.remainingHp.avg.toFixed(4)}</li>
+        <li class="highlight-row">平均残りHP: <span class="highlight-value">${result.remainingHp.avg.toFixed(4)}</span></li>
         <li>上限残りHP: ${result.remainingHp.max}</li>
         <li>下限残りHP: ${result.remainingHp.min}</li>
       </ul>
@@ -154,7 +154,7 @@ function renderResult(result) {
     <section>
       <h3>ダメージ計算結果</h3>
       <ul>
-        <li>平均ダメージ: ${result.total.avg.toFixed(4)}</li>
+        <li class="highlight-row">平均ダメージ: <span class="highlight-value">${result.total.avg.toFixed(4)}</span></li>
         <li>下限ダメージ: ${result.total.min}</li>
         <li>上限ダメージ: ${result.total.max}</li>
       </ul>

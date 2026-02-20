@@ -69,6 +69,12 @@ function getAttributeLevel() {
   return checked ? checked.value : "50";
 }
 
+function setToggleLabel(toggleId, expanded) {
+  byId(toggleId).textContent = expanded
+    ? "-----その他の詳細を格納▲-----"
+    : "-----その他の詳細入力▼-----";
+}
+
 function updateModeVisibility() {
   const mode = getDamageType();
   document.querySelectorAll(".physical-only").forEach((el) => {
@@ -77,6 +83,39 @@ function updateModeVisibility() {
   document.querySelectorAll(".attribute-only").forEach((el) => {
     el.classList.toggle("hidden", mode !== "特技(全体属性)");
   });
+}
+
+function toggleDetails(panelKey, forceExpanded) {
+  const mode = getDamageType();
+  const isAttacker = panelKey === "attacker";
+  const physicalDetails = byId(`${panelKey}PhysicalDetails`);
+  const attributeDetails = byId(`${panelKey}AttributeDetails`);
+  const toggleId = `${panelKey}DetailsToggle`;
+
+  const expanded = typeof forceExpanded === "boolean"
+    ? forceExpanded
+    : byId(toggleId).dataset.expanded !== "true";
+
+  byId(toggleId).dataset.expanded = expanded ? "true" : "false";
+  setToggleLabel(toggleId, expanded);
+
+  if (!expanded) {
+    physicalDetails.classList.add("hidden");
+    attributeDetails.classList.add("hidden");
+    return;
+  }
+
+  if (mode === "打撃") {
+    physicalDetails.classList.remove("hidden");
+    attributeDetails.classList.add("hidden");
+  } else {
+    physicalDetails.classList.add("hidden");
+    attributeDetails.classList.remove("hidden");
+  }
+
+  if (!isAttacker && mode === "特技(全体属性)") {
+    physicalDetails.classList.remove("hidden");
+  }
 }
 
 function renderResult(result) {
@@ -154,6 +193,11 @@ function main() {
   updateModeVisibility();
   updateAttributeLabels();
 
+  setToggleLabel("attackerDetailsToggle", false);
+  setToggleLabel("defenderDetailsToggle", false);
+  byId("attackerDetailsToggle").dataset.expanded = "false";
+  byId("defenderDetailsToggle").dataset.expanded = "false";
+
   const watchIds = [
     "attackPower", "attackStage", "attackMultiplier", "hitCount", "criticalCount",
     "defensePower", "defenseStage", "jankenResult", "autoGuard", "penetration", "targetHp",
@@ -172,9 +216,19 @@ function main() {
     recalculate();
   });
 
+  byId("attackerDetailsToggle").addEventListener("click", () => {
+    toggleDetails("attacker");
+  });
+
+  byId("defenderDetailsToggle").addEventListener("click", () => {
+    toggleDetails("defender");
+  });
+
   document.querySelectorAll('input[name="damageType"]').forEach((el) => {
     el.addEventListener("change", () => {
       updateModeVisibility();
+      toggleDetails("attacker", byId("attackerDetailsToggle").dataset.expanded === "true");
+      toggleDetails("defender", byId("defenderDetailsToggle").dataset.expanded === "true");
       recalculate();
     });
   });

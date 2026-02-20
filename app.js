@@ -419,9 +419,8 @@ function handleInputOrChange(event) {
 
     if (["damageType", "attributeType"].includes(attackerField)) {
       renderAll();
-    } else {
+    } else if (["hitCount", "criticalCount", "attributeHitCount", "attributeLevel"].includes(attackerField)) {
       renderAttackers();
-      renderDefender();
     }
 
     recalculate();
@@ -431,7 +430,6 @@ function handleInputOrChange(event) {
   const defenderField = event.target.dataset.defenderField;
   if (defenderField) {
     state.defender[defenderField] = event.target.value;
-    renderDefender();
     recalculate();
     return;
   }
@@ -454,5 +452,6 @@ function main() {
 }
 
 document.addEventListener("DOMContentLoaded", main);
+
 
 

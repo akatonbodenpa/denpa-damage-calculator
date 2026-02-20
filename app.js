@@ -2,9 +2,6 @@ function byId(id) {
   return document.getElementById(id);
 }
 
-const CLOSED_LABEL = "-----その他の詳細入力▼-----";
-const OPEN_LABEL = "-----その他の詳細を格納▲-----";
-
 function fillStageSelect(id) {
   const el = byId(id);
   for (let i = -9; i <= 9; i += 1) {
@@ -19,7 +16,9 @@ function fillStageSelect(id) {
 function fillAttributeSelects() {
   const rate = byId("attributeRateStage");
   rate.innerHTML = '<option value="none" selected>無し</option>';
-  for (let i = 1; i <= 9; i += 1) rate.innerHTML += `<option value="${i}">+${i}</option>`;
+  for (let i = 1; i <= 9; i += 1) {
+    rate.innerHTML += `<option value="${i}">+${i}</option>`;
+  }
 
   const resist = byId("attributeResistanceStage");
   resist.innerHTML = "";
@@ -31,7 +30,9 @@ function fillAttributeSelects() {
 
   const status = byId("attributeStatusStage");
   status.innerHTML = '<option value="none" selected>無し</option>';
-  for (let i = 1; i <= 9; i += 1) status.innerHTML += `<option value="${i}">+${i}</option>`;
+  for (let i = 1; i <= 9; i += 1) {
+    status.innerHTML += `<option value="${i}">+${i}</option>`;
+  }
 }
 
 function syncCriticalCountOptions() {
@@ -70,24 +71,17 @@ function getAttributeLevel() {
 
 function updateModeVisibility() {
   const mode = getDamageType();
-  document.querySelectorAll(".physical-only").forEach((el) => el.classList.toggle("hidden", mode !== "打撃"));
-  document.querySelectorAll(".attribute-only").forEach((el) => el.classList.toggle("hidden", mode !== "特技(全体属性)"));
-}
-
-function setupDetailToggle(buttonId, detailId) {
-  const button = byId(buttonId);
-  const detail = byId(detailId);
-  button.textContent = CLOSED_LABEL;
-  detail.classList.add("hidden");
-
-  button.addEventListener("click", () => {
-    detail.classList.toggle("hidden");
-    button.textContent = detail.classList.contains("hidden") ? CLOSED_LABEL : OPEN_LABEL;
+  document.querySelectorAll(".physical-only").forEach((el) => {
+    el.classList.toggle("hidden", mode !== "打撃");
+  });
+  document.querySelectorAll(".attribute-only").forEach((el) => {
+    el.classList.toggle("hidden", mode !== "特技(全体属性)");
   });
 }
 
 function renderResult(result) {
   const output = byId("output");
+
   if (result.error) {
     output.innerHTML = `<p class="error">${result.error}</p>`;
     return;
@@ -120,6 +114,13 @@ function renderResult(result) {
 function recalculate() {
   const damageType = getDamageType();
 
+  const common = {
+    jankenResult: byId("jankenResult").value,
+    autoGuard: byId("autoGuard").value,
+    penetration: byId("penetration").value,
+    targetHp: byId("targetHp").value.trim(),
+  };
+
   const result = damageType === "打撃"
     ? DamageCalculator.calculatePhysical({
       attackPower: byId("attackPower").value.trim(),
@@ -129,10 +130,7 @@ function recalculate() {
       criticalCount: byId("criticalCount").value,
       defensePower: byId("defensePower").value.trim(),
       defenseStage: byId("defenseStage").value,
-      jankenResult: byId("jankenResult").value,
-      autoGuard: byId("autoGuard").value,
-      penetration: byId("penetration").value,
-      targetHp: byId("targetHp").value.trim(),
+      ...common,
     })
     : DamageCalculator.calculateAttributeSpecial({
       attributeLevel: getAttributeLevel(),
@@ -142,10 +140,7 @@ function recalculate() {
       attributeResistanceStage: byId("attributeResistanceStage").value,
       attributeStatusStage: byId("attributeStatusStage").value,
       attributeHitCount: byId("attributeHitCount").value,
-      jankenResult: byId("jankenResultAttr").value,
-      autoGuard: byId("autoGuardAttr").value,
-      penetration: byId("penetrationAttr").value,
-      targetHp: byId("targetHpAttr").value.trim(),
+      ...common,
     });
 
   renderResult(result);
@@ -159,17 +154,11 @@ function main() {
   updateModeVisibility();
   updateAttributeLabels();
 
-  setupDetailToggle("attackerPhysicalToggle", "attackerPhysicalDetails");
-  setupDetailToggle("attackerAttributeToggle", "attackerAttributeDetails");
-  setupDetailToggle("defenderPhysicalToggle", "defenderPhysicalDetails");
-  setupDetailToggle("defenderAttributeToggle", "defenderAttributeDetails");
-
   const watchIds = [
     "attackPower", "attackStage", "attackMultiplier", "hitCount", "criticalCount",
     "defensePower", "defenseStage", "jankenResult", "autoGuard", "penetration", "targetHp",
     "attributeType", "skillMultiplier", "attributeRateStage", "attributeResistanceStage",
-    "attributeStatusStage", "attributeHitCount", "jankenResultAttr", "autoGuardAttr",
-    "penetrationAttr", "targetHpAttr",
+    "attributeStatusStage", "attributeHitCount",
   ];
 
   watchIds.forEach((id) => {

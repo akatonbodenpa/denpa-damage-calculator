@@ -64,7 +64,6 @@ function getDamageType() {
   return checked ? checked.value : "打撃";
 }
 
-
 function getAttributeLevel() {
   const checked = document.querySelector('input[name="attributeLevel"]:checked');
   return checked ? checked.value : "50";
@@ -88,6 +87,17 @@ function renderResult(result) {
     return;
   }
 
+  const hpBlock = result.remainingHp
+    ? `
+      <h4>残りHP</h4>
+      <ul>
+        <li>平均残りHP: ${result.remainingHp.avg.toFixed(4)}</li>
+        <li>上限残りHP: ${result.remainingHp.max}</li>
+        <li>下限残りHP: ${result.remainingHp.min}</li>
+      </ul>
+    `
+    : "";
+
   output.innerHTML = `
     <section>
       <h3>ダメージ計算結果</h3>
@@ -96,6 +106,7 @@ function renderResult(result) {
         <li>下限ダメージ: ${result.total.min}</li>
         <li>上限ダメージ: ${result.total.max}</li>
       </ul>
+      ${hpBlock}
     </section>
   `;
 }
@@ -103,17 +114,23 @@ function renderResult(result) {
 function recalculate() {
   const damageType = getDamageType();
 
+  const common = {
+    jankenResult: byId("jankenResult").value,
+    autoGuard: byId("autoGuard").value,
+    penetration: byId("penetration").value,
+    targetHp: byId("targetHp").value.trim(),
+  };
+
   const result = damageType === "打撃"
     ? DamageCalculator.calculatePhysical({
       attackPower: byId("attackPower").value.trim(),
       attackStage: byId("attackStage").value,
       attackMultiplier: byId("attackMultiplier").value.trim(),
-      jankenResult: byId("jankenResult").value,
       hitCount: byId("hitCount").value,
       criticalCount: byId("criticalCount").value,
       defensePower: byId("defensePower").value.trim(),
       defenseStage: byId("defenseStage").value,
-      autoGuard: byId("autoGuard").value,
+      ...common,
     })
     : DamageCalculator.calculateAttributeSpecial({
       attributeLevel: getAttributeLevel(),
@@ -122,9 +139,8 @@ function recalculate() {
       attributeRateStage: byId("attributeRateStage").value,
       attributeResistanceStage: byId("attributeResistanceStage").value,
       attributeStatusStage: byId("attributeStatusStage").value,
-      jankenResult: byId("jankenResult").value,
-      autoGuard: byId("autoGuard").value,
       attributeHitCount: byId("attributeHitCount").value,
+      ...common,
     });
 
   renderResult(result);
@@ -139,21 +155,10 @@ function main() {
   updateAttributeLabels();
 
   const watchIds = [
-    "attackPower",
-    "attackStage",
-    "attackMultiplier",
-    "jankenResult",
-    "hitCount",
-    "criticalCount",
-    "defensePower",
-    "defenseStage",
-    "autoGuard",
-    "attributeType",
-    "skillMultiplier",
-    "attributeRateStage",
-    "attributeResistanceStage",
-    "attributeStatusStage",
-    "attributeHitCount",
+    "attackPower", "attackStage", "attackMultiplier", "hitCount", "criticalCount",
+    "defensePower", "defenseStage", "jankenResult", "autoGuard", "penetration", "targetHp",
+    "attributeType", "skillMultiplier", "attributeRateStage", "attributeResistanceStage",
+    "attributeStatusStage", "attributeHitCount",
   ];
 
   watchIds.forEach((id) => {

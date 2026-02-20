@@ -267,7 +267,6 @@ function rerender() {
 
 function main() {
   fillStageSelect("defenseStage");
-  fillAttributeSelects();
 
   state.attackers.push(defaultAttacker());
 

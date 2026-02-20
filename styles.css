@@ -18,6 +18,22 @@ section {
   margin: 16px 0;
 }
 
+.page-description {
+  margin: 0 0 16px;
+  color: #343a40;
+}
+
+.highlight-row {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.highlight-value {
+  font-size: 1.2em;
+  color: #c92a2a;
+}
+
+
 .side-columns,
 .result-columns {
   display: grid;

@@ -6,19 +6,20 @@ body {
 }
 
 main {
-  max-width: 1120px;
+  max-width: 960px;
   margin: 24px auto;
   padding: 24px;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
 
 section {
   margin: 16px 0;
 }
 
-.side-columns {
+.side-columns,
+.result-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
@@ -31,60 +32,80 @@ section {
   border-radius: 10px;
 }
 
-.attacker-panel { border-color: #e03131; }
-.defender-panel { border-color: #1971c2; }
-
-.attacker-card { margin-bottom: 14px; }
-
-.attacker-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.delete-attacker {
-  border: 1px solid #d33;
-  background: #fff5f5;
-  color: #a40000;
-  padding: 4px 8px;
-  cursor: pointer;
-}
-
-.detail-toggle {
-  margin: 8px 0;
-  border: 1px solid #999;
-  background: #fafafa;
-  cursor: pointer;
-}
-
 .inline-two {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
-.inline-two label { margin: 0; }
+.inline-two label {
+  margin: 0;
+}
 
-label { display: block; margin: 8px 0; }
-input, select, button { display: block; margin-top: 4px; padding: 8px; font-size: 14px; }
+.attacker-panel {
+  border-color: #e03131;
+}
 
-.error { color: #b00020; font-weight: 700; }
-.hidden { display: none; }
+.defender-panel {
+  border-color: #1971c2;
+}
 
-.damage-type-group, .level-radio-group { margin: 8px 0 14px; }
-.damage-type-group > span, .level-radio-group > span { display: block; margin-bottom: 6px; }
-.damage-type-group label, .level-radio-group label {
+label {
+  display: block;
+  margin: 8px 0;
+}
+
+input, select, button {
+  display: block;
+  margin-top: 4px;
+  padding: 8px;
+  font-size: 14px;
+}
+
+button {
+  cursor: pointer;
+}
+
+.error {
+  color: #b00020;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .side-columns,
+  .result-columns,
+  .inline-two {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+
+.damage-type-group,
+.level-radio-group {
+  margin: 8px 0 14px;
+}
+
+.damage-type-group > span,
+.level-radio-group > span {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.damage-type-group label,
+.level-radio-group label {
   display: inline-flex;
   align-items: center;
   margin-right: 14px;
   white-space: nowrap;
 }
-.damage-type-group input[type="radio"], .level-radio-group input[type="radio"] {
+
+.damage-type-group input[type="radio"],
+.level-radio-group input[type="radio"] {
   display: inline-block;
   margin: 0 4px 0 0;
   padding: 0;
-}
-
-@media (max-width: 900px) {
-  .side-columns, .inline-two { grid-template-columns: 1fr; }
 }

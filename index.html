@@ -19,36 +19,45 @@
       <section class="side-panel defender-panel">
         <h2>攻撃される側</h2>
 
-        <div id="defenderPhysicalBlock" class="hidden">
+        <div id="defenderPhysicalBlock" class="physical-only hidden">
           <label>防御力
             <input id="defensePower" type="number" min="1" step="1" />
           </label>
+
           <button type="button" class="detail-toggle" id="defenderPhysicalToggle">-----その他の詳細入力▼-----</button>
           <div id="defenderPhysicalDetails" class="hidden">
             <label>防御力のバフ、デバフ状態
               <select id="defenseStage"></select>
             </label>
+            <label>オート防御、守り
+              <select id="autoGuard">
+                <option>無し</option>
+                <option>有り</option>
+              </select>
+            </label>
+            <label>HP
+              <input id="targetHp" type="number" min="1" step="1" />
+            </label>
           </div>
         </div>
 
-        <div id="defenderAttributeBlock" class="hidden">
-          <div id="defenderAttributeFields"></div>
+        <div id="defenderAttributeBlock" class="attribute-only hidden">
+          <div id="defenderAttributeResistanceFields"></div>
+
           <button type="button" class="detail-toggle" id="defenderAttributeToggle">-----その他の詳細入力▼-----</button>
           <div id="defenderAttributeDetails" class="hidden">
             <div id="defenderAttributeStatusFields"></div>
+            <label>オート防御、守り
+              <select id="autoGuardAttr">
+                <option>無し</option>
+                <option>有り</option>
+              </select>
+            </label>
+            <label>HP
+              <input id="targetHpAttr" type="number" min="1" step="1" />
+            </label>
           </div>
         </div>
-
-        <label>オート防御、守り
-          <select id="autoGuard">
-            <option>無し</option>
-            <option>有り</option>
-          </select>
-        </label>
-
-        <label>HP
-          <input id="targetHp" type="number" min="1" step="1" />
-        </label>
       </section>
     </div>
 

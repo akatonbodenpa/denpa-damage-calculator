@@ -61,16 +61,22 @@ function updateAttributeLabels() {
 
 function getDamageType() {
   const checked = document.querySelector('input[name="damageType"]:checked');
-  return checked ? checked.value : "物理ダメージ";
+  return checked ? checked.value : "打撃";
+}
+
+
+function getAttributeLevel() {
+  const checked = document.querySelector('input[name="attributeLevel"]:checked');
+  return checked ? checked.value : "50";
 }
 
 function updateModeVisibility() {
   const mode = getDamageType();
   document.querySelectorAll(".physical-only").forEach((el) => {
-    el.classList.toggle("hidden", mode !== "物理ダメージ");
+    el.classList.toggle("hidden", mode !== "打撃");
   });
   document.querySelectorAll(".attribute-only").forEach((el) => {
-    el.classList.toggle("hidden", mode !== "属性特技ダメージ");
+    el.classList.toggle("hidden", mode !== "特技(全体属性)");
   });
 }
 
@@ -97,7 +103,7 @@ function renderResult(result) {
 function recalculate() {
   const damageType = getDamageType();
 
-  const result = damageType === "物理ダメージ"
+  const result = damageType === "打撃"
     ? DamageCalculator.calculatePhysical({
       attackPower: byId("attackPower").value.trim(),
       attackStage: byId("attackStage").value,
@@ -110,7 +116,7 @@ function recalculate() {
       autoGuard: byId("autoGuard").value,
     })
     : DamageCalculator.calculateAttributeSpecial({
-      attributeLevel: byId("attributeLevel").value,
+      attributeLevel: getAttributeLevel(),
       attributeType: byId("attributeType").value,
       skillMultiplier: byId("skillMultiplier").value.trim(),
       attributeRateStage: byId("attributeRateStage").value,
@@ -142,7 +148,6 @@ function main() {
     "defensePower",
     "defenseStage",
     "autoGuard",
-    "attributeLevel",
     "attributeType",
     "skillMultiplier",
     "attributeRateStage",
@@ -167,6 +172,10 @@ function main() {
       updateModeVisibility();
       recalculate();
     });
+  });
+
+  document.querySelectorAll('input[name="attributeLevel"]').forEach((el) => {
+    el.addEventListener("change", recalculate);
   });
 
   byId("attributeType").addEventListener("change", () => {

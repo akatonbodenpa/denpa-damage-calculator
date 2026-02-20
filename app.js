@@ -244,7 +244,7 @@ function renderDefender() {
           </select>
         </label>
 
-        <label>HP
+        <label>HP(入力すると残りHPも下に表示されます)
           <input type="number" min="1" step="1" value="${d.targetHp}" data-defender-field="targetHp" />
         </label>
       ` : ""}
@@ -270,8 +270,7 @@ function renderResult(result) {
       <h4>残りHP</h4>
       <ul>
         <li class="highlight-row">平均残りHP: <span class="highlight-value">${result.remainingHp.avg.toFixed(2)}</span></li>
-        <li>上限残りHP: ${result.remainingHp.max}</li>
-        <li>下限残りHP: ${result.remainingHp.min}</li>
+        <li>残りHP乱数範囲: 下限${result.remainingHp.min} ～ 上限${result.remainingHp.max}</li>
       </ul>
     `
     : "";
@@ -280,9 +279,8 @@ function renderResult(result) {
     <section>
       <h3>ダメージ計算結果</h3>
       <ul>
-        <li class="highlight-row">平均ダメージ: <span class="highlight-value">${result.total.avg.toFixed(2)}</span></li>
-        <li>下限ダメージ: ${result.total.min}</li>
-        <li>上限ダメージ: ${result.total.max}</li>
+        <li class="highlight-row">平均: <span class="highlight-value">${result.total.avg.toFixed(2)}ダメージ</span></li>
+        <li>ダメージ乱数範囲: 下限${result.total.min} ～ 上限${result.total.max}</li>
       </ul>
       ${hpBlock}
     </section>
@@ -456,4 +454,5 @@ function main() {
 }
 
 document.addEventListener("DOMContentLoaded", main);
+
 

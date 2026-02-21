@@ -244,7 +244,7 @@ function renderDefender() {
           </select>
         </label>
 
-        <label>HP(入力すると残りHPも下に表示されます)
+        <label>HP(入力すると残りHPも下に出ます)
           <input type="number" min="1" step="1" value="${d.targetHp}" data-defender-field="targetHp" />
         </label>
       ` : ""}
@@ -452,6 +452,7 @@ function main() {
 }
 
 document.addEventListener("DOMContentLoaded", main);
+
 
 
 

@@ -4,7 +4,6 @@ function byId(id) {
 
 const ATTRIBUTES = ["火", "水", "電気", "土", "風", "氷", "闇", "光"];
 const MAX_ATTACKERS = 8;
-
 const STATUS_LABELS = {
   火: "やけど",
   水: "水浸し",
@@ -452,6 +451,7 @@ function main() {
 }
 
 document.addEventListener("DOMContentLoaded", main);
+
 
 
 

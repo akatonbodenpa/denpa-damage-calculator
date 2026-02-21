@@ -151,7 +151,6 @@
 
     const normalSummary = summarizeDistribution(normal);
     const criticalSummary = summarizeDistribution(critical);
-
     const result = {
       total: {
         avg: normalSummary.avg * normalCount + criticalSummary.avg * criticalCount,
@@ -253,4 +252,5 @@
 
   global.DamageCalculator = api;
 })(typeof window !== "undefined" ? window : globalThis);
+
 

@@ -156,3 +156,9 @@ button {
   margin: 0 4px 0 0;
   padding: 0;
 }
+
+#output > section {
+  border: 2px solid #111;
+  border-radius: 8px;
+  padding: 12px;
+}

@@ -4,8 +4,13 @@
   }
 
   function applyStage(stat, stage) {
-    return floor(stat * (1 + stage * 0.1));
+    const adjusted = stat * (1 + stage * 0.1);
+    if (stage <= -6) {
+      return Math.round(adjusted);
+    }
+    return floor(adjusted);
   }
+
 
   function uniformDistribution(low, high, applyModifiers = true) {
     const count = high - low + 1;
@@ -252,5 +257,6 @@
 
   global.DamageCalculator = api;
 })(typeof window !== "undefined" ? window : globalThis);
+
 
 

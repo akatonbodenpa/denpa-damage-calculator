@@ -1,11 +1,11 @@
 (function (global) {
   function floor(n) {
-    return Math.floor(n);
+    return Math.floor(n + 1e-10);
   }
 
   function applyStage(stat, stage) {
     const adjusted = stat * (1 + stage * 0.1);
-    return floor(adjusted + 1e-10);
+    return floor(adjusted);
   }
 
   function uniformDistribution(low, high, applyModifiers = true) {
@@ -253,6 +253,7 @@
 
   global.DamageCalculator = api;
 })(typeof window !== "undefined" ? window : globalThis);
+
 
 
 

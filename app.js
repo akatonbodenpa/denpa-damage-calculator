@@ -16,6 +16,7 @@ const STATUS_LABELS = {
 
 function createDefaultAttacker() {
   return {
+    name: "",
     damageType: "打撃",
     attackPower: "",
     attackStage: "0",
@@ -28,7 +29,9 @@ function createDefaultAttacker() {
     attributeRateStage: "none",
     attributeHitCount: "1",
     jankenResult: "無し、あいこ",
+    weakDamagePlus: "",
     penetration: "無し",
+    collapsed: false,
     detailsExpanded: false,
   };
 }
@@ -40,10 +43,13 @@ function createDefaultDefender() {
   });
 
   return {
+    name: "",
     defensePower: "",
     defenseStage: "0",
+    weakCover: "",
     autoGuard: "無し",
     targetHp: "",
+    collapsed: false,
     detailsExpanded: false,
     attributes,
   };
@@ -64,7 +70,53 @@ function stageOptions(start, end, selected) {
 }
 
 function detailsLabel(expanded) {
-  return expanded ? "-----その他の詳細を格納▲-----" : "-----その他の詳細入力▼-----";
+  return expanded ? "その他の詳細を格納▲" : "その他の詳細入力▼";
+}
+
+function attrColorClass(attr) {
+  const table = {
+    火: "attr-fire",
+    水: "attr-water",
+    電気: "attr-electric",
+    土: "attr-earth",
+    風: "attr-wind",
+    氷: "attr-ice",
+    光: "attr-light",
+    闇: "attr-dark",
+  };
+  return table[attr] || "";
+}
+
+function attrOptionColor(attr) {
+  const table = {
+    火: "#ffc7c7",
+    水: "#70bfff",
+    電気: "#ffef9c",
+    土: "#ffe8cc",
+    風: "#ddf7dd",
+    氷: "#dceeff",
+    光: "#ffffff",
+    闇: "#eddcff",
+  };
+  return table[attr] || "#ffffff";
+}
+
+function fillWithHyphen(baseLabel, width) {
+  const safeWidth = Math.max(0, width || 0);
+  const charWidth = 8;
+  const baseLength = [...baseLabel].length;
+  const totalChars = Math.max(baseLength + 2, Math.floor((safeWidth - 16) / charWidth));
+  const hyphenTotal = Math.max(0, totalChars - baseLength);
+  const left = Math.floor(hyphenTotal / 2);
+  const right = hyphenTotal - left;
+  return `${"-".repeat(left)}${baseLabel}${"-".repeat(right)}`;
+}
+
+function updateFillLabels() {
+  document.querySelectorAll("[data-fill-label]").forEach((el) => {
+    const baseLabel = el.dataset.fillLabel || "";
+    el.textContent = fillWithHyphen(baseLabel, el.clientWidth);
+  });
 }
 
 function syncCriticalCount(attacker) {
@@ -80,25 +132,33 @@ function renderAttackers() {
   const html = state.attackers.map((attacker, index) => {
     syncCriticalCount(attacker);
     const n = index + 1;
-    const showDelete = state.attackers.length > 1;
     const isPhysical = attacker.damageType === "打撃";
-
-    const criticalOptions = [0, 1, 2, 3]
-      .filter((x) => x <= Number.parseInt(attacker.hitCount, 10))
-      .map((x) => `<option value="${x}"${String(x) === attacker.criticalCount ? " selected" : ""}>${x}回</option>`)
-      .join("");
 
     return `
       <section class="side-panel attacker-panel" data-attacker-index="${index}">
         <div class="panel-head">
-          <h2>攻撃する側 ${n}人目</h2>
-          ${showDelete ? `<button type="button" class="mini-delete" data-action="delete-attacker" data-index="${index}">削除×</button>` : ""}
+          <input
+            type="text"
+            class="header-name-input attacker-name-input"
+            value="${attacker.name}"
+            placeholder="攻撃側${n}人目"
+            data-index="${index}"
+            data-field="name"
+            aria-label="攻撃側${n}人目の名前"
+          />
+          <div class="panel-actions">
+            <button type="button" class="mini-toggle fill-toggle" data-fill-label="${attacker.collapsed ? "展開▼" : "格納▲"}" data-action="toggle-attacker-collapsed" data-index="${index}">${attacker.collapsed ? "展開▼" : "格納▲"}</button>
+            <button type="button" class="mini-delete" data-action="delete-attacker" data-index="${index}" aria-label="攻撃側${n}人目を削除またはリセット">×</button>
+          </div>
         </div>
 
+        ${attacker.collapsed ? "" : `
         <div class="damage-type-group">
           <span>攻撃手段</span>
-          <label><input type="radio" name="damageType-${index}" value="打撃" data-index="${index}" data-field="damageType"${isPhysical ? " checked" : ""}/> 打撃</label>
-          <label><input type="radio" name="damageType-${index}" value="特技(全体属性)" data-index="${index}" data-field="damageType"${!isPhysical ? " checked" : ""}/> 特技(全体属性)</label>
+          <div class="segmented-control">
+            <label><input type="radio" name="damageType-${index}" value="打撃" data-index="${index}" data-field="damageType"${isPhysical ? " checked" : ""}/><span>打撃</span></label>
+            <label><input type="radio" name="damageType-${index}" value="特技(全体属性)" data-index="${index}" data-field="damageType"${!isPhysical ? " checked" : ""}/><span>特技(全体属性)</span></label>
+          </div>
         </div>
 
         ${isPhysical ? `
@@ -108,17 +168,19 @@ function renderAttackers() {
         ` : `
           <div class="level-radio-group">
             <span>攻撃する側のレベル</span>
-            <label><input type="radio" name="attributeLevel-${index}" value="50" data-index="${index}" data-field="attributeLevel"${attacker.attributeLevel === "50" ? " checked" : ""}/>50レベル</label>
-            <label><input type="radio" name="attributeLevel-${index}" value="100" data-index="${index}" data-field="attributeLevel"${attacker.attributeLevel === "100" ? " checked" : ""}/>100レベル</label>
+            <div class="segmented-control">
+              <label><input type="radio" name="attributeLevel-${index}" value="50" data-index="${index}" data-field="attributeLevel"${attacker.attributeLevel === "50" ? " checked" : ""}/><span>50レベル</span></label>
+              <label><input type="radio" name="attributeLevel-${index}" value="100" data-index="${index}" data-field="attributeLevel"${attacker.attributeLevel === "100" ? " checked" : ""}/><span>100レベル</span></label>
+            </div>
           </div>
           <label>特技の属性
-            <select data-index="${index}" data-field="attributeType">
-              ${ATTRIBUTES.map((attr) => `<option${attr === attacker.attributeType ? " selected" : ""}>${attr}</option>`).join("")}
+            <select class="attr-select ${attrColorClass(attacker.attributeType)}" data-index="${index}" data-field="attributeType">
+              ${ATTRIBUTES.map((attr) => `<option style="background:${attrOptionColor(attr)}"${attr === attacker.attributeType ? " selected" : ""}>${attr}</option>`).join("")}
             </select>
           </label>
         `}
 
-        <button type="button" class="details-toggle" data-action="toggle-attacker-details" data-index="${index}">${detailsLabel(attacker.detailsExpanded)}</button>
+        <button type="button" class="details-toggle" data-fill-label="${detailsLabel(attacker.detailsExpanded)}" data-action="toggle-attacker-details" data-index="${index}">${detailsLabel(attacker.detailsExpanded)}</button>
 
         ${attacker.detailsExpanded ? `
           ${isPhysical ? `
@@ -133,51 +195,71 @@ function renderAttackers() {
               <input type="number" step="0.01" placeholder="親アヒルのみの例：0.5" value="${attacker.skillMultiplier}" data-index="${index}" data-field="skillMultiplier" />
             </label>
             <label>${attacker.attributeType}属性倍率
-              <select data-index="${index}" data-field="attributeRateStage">
+              <select class="attr-select ${attrColorClass(attacker.attributeType)}" data-index="${index}" data-field="attributeRateStage">
                 <option value="none"${attacker.attributeRateStage === "none" ? " selected" : ""}>無し</option>
                 ${stageOptions(1, 9, attacker.attributeRateStage)}
               </select>
             </label>
           `}
 
-          <label>攻撃側のじゃんけん勝敗
-            <select data-index="${index}" data-field="jankenResult">
-              <option${attacker.jankenResult === "無し、あいこ" ? " selected" : ""}>無し、あいこ</option>
-              <option${attacker.jankenResult === "勝ち" ? " selected" : ""}>勝ち</option>
-              <option${attacker.jankenResult === "負け" ? " selected" : ""}>負け</option>
-            </select>
-          </label>
+          <div class="segmented-row">
+            <span>攻撃側のじゃんけん勝敗</span>
+            <div class="segmented-control">
+              <label><input type="radio" name="jankenResult-${index}" value="無し、あいこ" data-index="${index}" data-field="jankenResult"${attacker.jankenResult === "無し、あいこ" ? " checked" : ""}/><span>無し、あいこ</span></label>
+              <label><input type="radio" name="jankenResult-${index}" value="勝ち" data-index="${index}" data-field="jankenResult"${attacker.jankenResult === "勝ち" ? " checked" : ""}/><span>勝ち</span></label>
+              <label><input type="radio" name="jankenResult-${index}" value="負け" data-index="${index}" data-field="jankenResult"${attacker.jankenResult === "負け" ? " checked" : ""}/><span>負け</span></label>
+            </div>
+          </div>
 
-          <label>貫通
-            <select data-index="${index}" data-field="penetration">
-              <option${attacker.penetration === "無し" ? " selected" : ""}>無し</option>
-              <option${attacker.penetration === "有り" ? " selected" : ""}>有り</option>
-            </select>
-          </label>
+          ${attacker.jankenResult === "勝ち" ? `
+            <label>弱点ダメージ＋
+              <div class="percent-input-wrap">
+                <input type="number" min="0" step="1" value="${attacker.weakDamagePlus}" data-index="${index}" data-field="weakDamagePlus" />
+                <span class="percent-suffix">%</span>
+              </div>
+            </label>
+          ` : ""}
+
+          <div class="segmented-row">
+            <span>貫通</span>
+            <div class="segmented-control">
+              <label><input type="radio" name="penetration-${index}" value="無し" data-index="${index}" data-field="penetration"${attacker.penetration === "無し" ? " checked" : ""}/><span>無し</span></label>
+              <label><input type="radio" name="penetration-${index}" value="有り" data-index="${index}" data-field="penetration"${attacker.penetration === "有り" ? " checked" : ""}/><span>有り</span></label>
+            </div>
+          </div>
 
           ${isPhysical ? `
             <div class="inline-two">
-              <label>攻撃ヒット数
-                <select data-index="${index}" data-field="hitCount">
-                  <option value="1"${attacker.hitCount === "1" ? " selected" : ""}>1回</option>
-                  <option value="2"${attacker.hitCount === "2" ? " selected" : ""}>2回</option>
-                  <option value="3"${attacker.hitCount === "3" ? " selected" : ""}>3回</option>
-                </select>
-              </label>
-              <label>クリティカル発生回数
-                <select data-index="${index}" data-field="criticalCount">${criticalOptions}</select>
-              </label>
+              <div class="segmented-row">
+                <span>攻撃ヒット数</span>
+                <div class="segmented-control vertical-control">
+                  <label><input type="radio" name="hitCount-${index}" value="1" data-index="${index}" data-field="hitCount"${attacker.hitCount === "1" ? " checked" : ""}/><span>1回</span></label>
+                  <label><input type="radio" name="hitCount-${index}" value="2" data-index="${index}" data-field="hitCount"${attacker.hitCount === "2" ? " checked" : ""}/><span>2回</span></label>
+                  <label><input type="radio" name="hitCount-${index}" value="3" data-index="${index}" data-field="hitCount"${attacker.hitCount === "3" ? " checked" : ""}/><span>3回</span></label>
+                </div>
+              </div>
+              <div class="segmented-row">
+                <span>クリティカル発生回数</span>
+                <div class="segmented-control vertical-control">
+                  ${[0, 1, 2, 3]
+                    .filter((x) => x <= Number.parseInt(attacker.hitCount, 10))
+                    .map((x) => `<label><input type="radio" name="criticalCount-${index}" value="${x}" data-index="${index}" data-field="criticalCount"${String(x) === attacker.criticalCount ? " checked" : ""}/><span>${x}回</span></label>`)
+                    .join("")}
+                </div>
+              </div>
             </div>
           ` : `
-            <label>特技ヒット数
-              <select data-index="${index}" data-field="attributeHitCount">
-                <option value="1"${attacker.attributeHitCount === "1" ? " selected" : ""}>1回</option>
-                <option value="2"${attacker.attributeHitCount === "2" ? " selected" : ""}>2回</option>
-                <option value="3"${attacker.attributeHitCount === "3" ? " selected" : ""}>3回</option>
-              </select>
-            </label>
+            <div class="segmented-row">
+              <span>特技ヒット数</span>
+              <div class="segmented-control vertical-control">
+                <label><input type="radio" name="attributeHitCount-${index}" value="1" data-index="${index}" data-field="attributeHitCount"${attacker.attributeHitCount === "1" ? " checked" : ""}/><span>1回</span></label>
+                <label><input type="radio" name="attributeHitCount-${index}" value="2" data-index="${index}" data-field="attributeHitCount"${attacker.attributeHitCount === "2" ? " checked" : ""}/><span>2回</span></label>
+                <label><input type="radio" name="attributeHitCount-${index}" value="3" data-index="${index}" data-field="attributeHitCount"${attacker.attributeHitCount === "3" ? " checked" : ""}/><span>3回</span></label>
+              </div>
+            </div>
           `}
         ` : ""}
+        `}
       </section>
     `;
   }).join("");
@@ -186,6 +268,8 @@ function renderAttackers() {
     ${html}
     ${state.attackers.length < MAX_ATTACKERS ? '<button type="button" id="addAttackerButton" class="add-attacker">攻撃キャラクターを追加＋</button>' : ""}
   `;
+
+  updateFillLabels();
 }
 
 function getUsedModes() {
@@ -198,27 +282,47 @@ function getUsedModes() {
 function renderDefender() {
   const { hasPhysical, usedAttributes } = getUsedModes();
   const hasAttribute = usedAttributes.length > 0;
+  const hasJankenWin = state.attackers.some((x) => x.jankenResult === "勝ち");
+  const statusAttributes = usedAttributes.filter((attr) => attr !== "光");
   const d = state.defender;
 
   byId("defenderColumn").innerHTML = `
     <section class="side-panel defender-panel">
-      <h2>攻撃される側</h2>
+      <div class="panel-head">
+        <input
+          type="text"
+          class="header-name-input defender-name-input"
+          value="${d.name}"
+          placeholder="攻撃される側"
+          data-defender-field="name"
+          aria-label="攻撃される側の名前"
+        />
+        <div class="panel-actions">
+          <button type="button" class="mini-toggle fill-toggle" data-fill-label="${d.collapsed ? "展開▼" : "格納▲"}" data-action="toggle-defender-collapsed">${d.collapsed ? "展開▼" : "格納▲"}</button>
+          <button type="button" class="mini-delete" data-action="reset-defender" aria-label="攻撃される側をリセット">×</button>
+        </div>
+      </div>
 
+      ${d.collapsed ? "" : `
       ${hasPhysical ? `
         <label>防御力
           <input type="number" min="1" step="1" value="${d.defensePower}" data-defender-field="defensePower" />
         </label>
       ` : ""}
 
-      ${hasAttribute ? usedAttributes.map((attr) => `
-        <label>${attr}属性耐性
-          <select data-defender-attr="${attr}" data-defender-kind="resistance">
-            ${stageOptions(-4, 9, d.attributes[attr].resistance)}
-          </select>
-        </label>
-      `).join("") : ""}
+      ${hasAttribute ? `
+        <div class="attribute-grid">
+          ${usedAttributes.map((attr) => `
+            <label>${attr}耐性
+              <select class="attr-select ${attrColorClass(attr)}" data-defender-attr="${attr}" data-defender-kind="resistance">
+                ${stageOptions(-4, 9, d.attributes[attr].resistance)}
+              </select>
+            </label>
+          `).join("")}
+        </div>
+      ` : ""}
 
-      <button type="button" class="details-toggle" data-action="toggle-defender-details">${detailsLabel(d.detailsExpanded)}</button>
+      <button type="button" class="details-toggle" data-fill-label="${detailsLabel(d.detailsExpanded)}" data-action="toggle-defender-details">${detailsLabel(d.detailsExpanded)}</button>
 
       ${d.detailsExpanded ? `
         ${hasPhysical ? `
@@ -227,28 +331,45 @@ function renderDefender() {
           </label>
         ` : ""}
 
-        ${hasAttribute ? usedAttributes.filter((attr) => attr !== "光").map((attr) => `
-          <label>${STATUS_LABELS[attr] || `${attr}属性状態異常`}
-            <select data-defender-attr="${attr}" data-defender-kind="status">
-              <option value="none"${d.attributes[attr].status === "none" ? " selected" : ""}>無し</option>
-              ${stageOptions(1, 9, d.attributes[attr].status)}
-            </select>
-          </label>
-        `).join("") : ""}
+        ${statusAttributes.length > 0 ? `
+          <div class="attribute-grid">
+            ${statusAttributes.map((attr) => `
+              <label>${STATUS_LABELS[attr] || `${attr}属性状態異常`}
+                <select class="attr-select ${attrColorClass(attr)}" data-defender-attr="${attr}" data-defender-kind="status">
+                  <option value="none"${d.attributes[attr].status === "none" ? " selected" : ""}>無し</option>
+                  ${stageOptions(1, 9, d.attributes[attr].status)}
+                </select>
+              </label>
+            `).join("")}
+          </div>
+        ` : ""}
 
-        <label>オート防御、守り
-          <select data-defender-field="autoGuard">
-            <option${d.autoGuard === "無し" ? " selected" : ""}>無し</option>
-            <option${d.autoGuard === "有り" ? " selected" : ""}>有り</option>
-          </select>
-        </label>
+        ${hasJankenWin ? `
+          <label>弱点カバー
+            <div class="percent-input-wrap">
+              <input type="number" min="0" step="1" value="${d.weakCover}" data-defender-field="weakCover" />
+              <span class="percent-suffix">%</span>
+            </div>
+          </label>
+        ` : ""}
+
+        <div class="segmented-row">
+          <span>オート防御、守り</span>
+          <div class="segmented-control">
+            <label><input type="radio" name="autoGuard" value="無し" data-defender-field="autoGuard"${d.autoGuard === "無し" ? " checked" : ""}/><span>無し</span></label>
+            <label><input type="radio" name="autoGuard" value="有り" data-defender-field="autoGuard"${d.autoGuard === "有り" ? " checked" : ""}/><span>有り</span></label>
+          </div>
+        </div>
 
         <label>HP(入力すると残りHPも下に出ます)
           <input type="number" min="1" step="1" value="${d.targetHp}" data-defender-field="targetHp" />
         </label>
       ` : ""}
+      `}
     </section>
   `;
+
+  updateFillLabels();
 }
 
 function renderAll() {
@@ -296,6 +417,8 @@ function recalculate() {
     const a = state.attackers[i];
     const common = {
       jankenResult: a.jankenResult,
+      weakDamagePlus: a.weakDamagePlus.trim(),
+      weakCover: d.weakCover.trim(),
       autoGuard: d.autoGuard,
       penetration: a.penetration,
       targetHp: "",
@@ -380,8 +503,12 @@ function handleClick(event) {
   const deleteButton = event.target.closest('[data-action="delete-attacker"]');
   if (deleteButton) {
     const index = Number.parseInt(deleteButton.dataset.index, 10);
-    if (state.attackers.length > 1 && Number.isInteger(index)) {
-      state.attackers.splice(index, 1);
+    if (Number.isInteger(index)) {
+      if (state.attackers.length > 1) {
+        state.attackers.splice(index, 1);
+      } else {
+        state.attackers[0] = createDefaultAttacker();
+      }
       renderAll();
       recalculate();
     }
@@ -399,9 +526,36 @@ function handleClick(event) {
     return;
   }
 
+  const attackerCollapsedToggle = event.target.closest('[data-action="toggle-attacker-collapsed"]');
+  if (attackerCollapsedToggle) {
+    const index = Number.parseInt(attackerCollapsedToggle.dataset.index, 10);
+    if (Number.isInteger(index)) {
+      state.attackers[index].collapsed = !state.attackers[index].collapsed;
+      renderAttackers();
+      recalculate();
+    }
+    return;
+  }
+
   const defenderToggle = event.target.closest('[data-action="toggle-defender-details"]');
   if (defenderToggle) {
     state.defender.detailsExpanded = !state.defender.detailsExpanded;
+    renderDefender();
+    recalculate();
+    return;
+  }
+
+  const defenderCollapsedToggle = event.target.closest('[data-action="toggle-defender-collapsed"]');
+  if (defenderCollapsedToggle) {
+    state.defender.collapsed = !state.defender.collapsed;
+    renderDefender();
+    recalculate();
+    return;
+  }
+
+  const defenderReset = event.target.closest('[data-action="reset-defender"]');
+  if (defenderReset) {
+    state.defender = createDefaultDefender();
     renderDefender();
     recalculate();
   }
@@ -416,7 +570,7 @@ function handleInputOrChange(event) {
     if (!Number.isInteger(index)) return;
     updateAttackerField(index, attackerField, event.target.value);
 
-    if (["damageType", "attributeType"].includes(attackerField)) {
+    if (["damageType", "attributeType", "jankenResult"].includes(attackerField)) {
       renderAll();
     } else if (["hitCount", "criticalCount", "attributeHitCount", "attributeLevel"].includes(attackerField)) {
       renderAttackers();
@@ -448,11 +602,7 @@ function main() {
   document.addEventListener("click", handleClick);
   document.addEventListener("input", handleInputOrChange);
   document.addEventListener("change", handleInputOrChange);
+  window.addEventListener("resize", updateFillLabels);
 }
 
 document.addEventListener("DOMContentLoaded", main);
-
-
-
-
-
